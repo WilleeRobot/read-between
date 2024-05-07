@@ -32,7 +32,7 @@ public_users.get("/author/:author", function (req, res) {
   // Defining an object to store the books of the author
   let authorBooks = {};
 
-  // Checking if the author exists in the books database
+  // Checking if the author query param is invalid
   if (!author) {
     return res.status(404).json({ message: "Author not found" });
   }
@@ -60,8 +60,29 @@ public_users.get("/author/:author", function (req, res) {
 
 // Get all books based on title
 public_users.get("/title/:title", function (req, res) {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  // Normalizing the title name from client
+  const title = req.params.title.toLowerCase().replace(/[\s-]+/g, "");
+  let returnedBook = {};
+
+  // Checking if the title exists in the books database
+  if (!title) {
+    return res.status(404).json({ message: "Title not found" });
+  }
+
+  // Iterating through the books database to find the book with the title
+  for (let book in books) {
+    // Normalizing the title name from the books database
+    const booktitle = books[book].title.toLowerCase().replace(/[\s-]+/g, "");
+
+    // Checking if the title of the book matches the title from the client
+    if (booktitle === title) {
+      returnedBook[book] = books[book];
+      return res.status(200).json(returnedBook);
+    }
+  }
+
+  // If the title is not found, return a 404 status code
+  return res.status(404).json({ message: "Title not found" });
 });
 
 //  Get book review
